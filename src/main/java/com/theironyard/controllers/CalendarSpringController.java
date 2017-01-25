@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,9 +30,12 @@ public class CalendarSpringController {
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public String home(Model model, HttpSession session) {
         String userName = (String) session.getAttribute("userName"); // Getting userName from session
-        List<Event> eventEntities = events.findAllByOrderByDateTimeDesc();
+        List<Event> eventEntities = new ArrayList<>();
         if (userName != null) { // if we have a current user in session
             User user = users.findFirstByName(userName); //find the user object by session name
+            if (user != null) {
+                eventEntities = events.findAllByUserOrderByDateTimeDesc(user);
+            }
             model.addAttribute("user", user); // add this user to our model
             model.addAttribute("now", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)); //gives a local date/time
         }

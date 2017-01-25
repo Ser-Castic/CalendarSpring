@@ -53,7 +53,8 @@ public class CalendarSpringApplicationTests {
 		testLogin(); // to make sure a user exists
 
 		mockMvc.perform(
-				MockMvcRequestBuilders.post("/create-event") //endpoint being tested
+				MockMvcRequestBuilders
+						.post("/create-event") //endpoint being tested
 						.param("description", "Test event")
 						.param("dateTime", LocalDateTime.now().toString()) // params being tested
 						.sessionAttr("userName", "TestUser") // looks up the user in database

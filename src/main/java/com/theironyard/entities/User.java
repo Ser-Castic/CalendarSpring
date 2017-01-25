@@ -1,6 +1,7 @@
 package com.theironyard.entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by Sam on 1/25/17
