@@ -17,13 +17,14 @@ Welcome, {{name}}!<br />
 
 <form action="/create-event" method="post">
     <input type="text" placeholder="Description" name="description" size="50"/>
-    <input type="datetime-local" name="dateTime" value="{{now}}"/>
+    <input type="datetime-local" name="dateTimeStart" value="{{now}}"/>
+    <input type="datetime-local" name="dateTimeEnd" value="{{oneAhead}}"/>
     <button type="submit">Add Event</button>
 </form>
 {{/user}}
 
 {{#events}}
-{{description}} {{dateTime}}<br />
+{{description}}&nbsp;&nbsp;&nbsp;{{dateTimeStart}}&nbsp;&nbsp;&nbsp;{{dateTimeEnd}}<br />
 {{/events}}
 </body>
 </html>

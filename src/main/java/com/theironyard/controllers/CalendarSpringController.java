@@ -27,6 +27,14 @@ public class CalendarSpringController {
     @Autowired
     UserRepository users;
 
+    public static boolean eventTimeConflict (LocalDateTime start, LocalDateTime end) {
+
+       if(end.isBefore(start)){
+           return true; // conflict exists
+       }
+       return false; // conflict doesn't exist
+    }
+
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public String home(Model model, HttpSession session) {
         String userName = (String) session.getAttribute("userName"); // Getting userName from session
@@ -34,22 +42,26 @@ public class CalendarSpringController {
         if (userName != null) { // if we have a current user in session
             User user = users.findFirstByName(userName); //find the user object by session name
             if (user != null) {
-                eventEntities = events.findAllByUserOrderByDateTimeDesc(user);
+                eventEntities = events.findAllByUserOrderByDateTimeStartDesc(user);
             }
             model.addAttribute("user", user); // add this user to our model
-            model.addAttribute("now", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)); //gives a local date/time
+            model.addAttribute("now", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));//gives a local date/time now
+            model.addAttribute("oneAhead", LocalDateTime.now().plusSeconds(1).truncatedTo(ChronoUnit.SECONDS)); // gives a time one second ahead
         }
         model.addAttribute("events", eventEntities); //store the events
         return "home"; // go to home.html
     }
 
     @RequestMapping(path = "/create-event", method = RequestMethod.POST)
-    public String createEvent(HttpSession session, String description, String dateTime) { // expects a session , and two strings
+    public String createEvent(HttpSession session, String description, String dateTimeStart, String dateTimeEnd) { // expects a session , and two strings
         String userName = (String) session.getAttribute("userName"); // gets userName from session
         if (userName != null) { // if we have a user in session
-            Event event = new Event(description, LocalDateTime.parse(dateTime), users.findFirstByName(userName)); // creates even object with the parameters that were passed
+            Event event = new Event(description, LocalDateTime.parse(dateTimeStart), LocalDateTime.parse(dateTimeEnd), users.findFirstByName(userName)); // creates event object with the parameters that were passed
             // also we find the user that with the session userName
-            events.save(event); // saves the even object
+           boolean conflict = eventTimeConflict(event.getDateTimeStart(), event.getDateTimeEnd());
+            if(conflict == false) {
+                events.save(event); // saves the even object
+            }
         }
         return "redirect:/"; // redirects back to "/" endpoint which sends back to home.html
     }
