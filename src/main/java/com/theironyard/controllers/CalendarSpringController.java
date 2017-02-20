@@ -53,14 +53,36 @@ public class CalendarSpringController {
     }
 
     @RequestMapping(path = "/create-event", method = RequestMethod.POST)
-    public String createEvent(HttpSession session, String description, String dateTimeStart, String dateTimeEnd) { // expects a session , and two strings
+    public String createEvent(HttpSession session, String description, String dateTimeStart, String dateTimeEnd) throws Exception { // expects a session , and two strings
         String userName = (String) session.getAttribute("userName"); // gets userName from session
         if (userName != null) { // if we have a user in session
             Event event = new Event(description, LocalDateTime.parse(dateTimeStart), LocalDateTime.parse(dateTimeEnd), users.findFirstByName(userName)); // creates event object with the parameters that were passed
             // also we find the user that with the session userName
            boolean conflict = eventTimeConflict(event.getDateTimeStart(), event.getDateTimeEnd());
             if(conflict == false) {
-                events.save(event); // saves the even object
+                int count = 0;
+                List<Event> eventCheck;
+                eventCheck = events.findAllByUserOrderByDateTimeStartDesc(users.findFirstByName(userName));
+                for (int i = 0; i < eventCheck.size(); i++) {
+                    if(event.getDateTimeStart().isEqual(eventCheck.get(i).getDateTimeStart())
+                            || event.getDateTimeEnd().isEqual(eventCheck.get(i).getDateTimeEnd())
+                            || event.getDateTimeStart().isEqual(eventCheck.get(i).getDateTimeEnd())
+                            || event.getDateTimeEnd().isEqual(eventCheck.get(i).getDateTimeStart())
+                            || event.getDateTimeStart().isBefore(eventCheck.get(i).getDateTimeEnd())
+                            || event.getDateTimeEnd().isBefore(eventCheck.get(i).getDateTimeEnd())) {
+                        count = 1;
+                        break;
+                    } else if(event.getDateTimeStart().isBefore(eventCheck.get(i).getDateTimeStart())
+                    && event.getDateTimeEnd().isBefore(eventCheck.get(i).getDateTimeStart())) {
+                        count = 0;
+                    } else if(event.getDateTimeStart().isAfter(eventCheck.get(i).getDateTimeEnd())
+                            && event.getDateTimeEnd().isAfter(eventCheck.get(i).getDateTimeEnd())) {
+                        count = 0;
+                    }
+                }
+                if(count == 0) {
+                    events.save(event);
+                }
             }
         }
         return "redirect:/"; // redirects back to "/" endpoint which sends back to home.html

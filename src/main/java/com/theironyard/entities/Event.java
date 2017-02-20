@@ -2,6 +2,7 @@ package com.theironyard.entities;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Created by Sam on 1/25/17
@@ -23,6 +24,8 @@ public class Event {
     @Column(nullable = false)
     LocalDateTime dateTimeEnd;
 
+//    @ManyToMany
+//    List<Event> users;
     @ManyToOne
     User user;
 
