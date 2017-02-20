@@ -3,7 +3,22 @@
 <html>
 <head>
 <style>
-    
+body
+{
+    background-color: lightblue;
+    background-image: url("http://www.dastraining.de/images/pictures/shutterstock_94066795.jpg")
+}
+p
+{
+    border-style: dotted;
+    border-color: red;
+}
+div
+{
+    border-left: 6px solid green;
+    background-color: lightgrey;
+}
+
 </style>
 </head>
 <body>
@@ -13,7 +28,6 @@
     <button type="submit">Login</button>
 </form>
 {{/user}}
-
 {{#user}}
 Welcome, {{name}}!<br />
 <form action="/logout" method="post">
@@ -26,8 +40,12 @@ Welcome, {{name}}!<br />
     <button type="submit">Add Event</button>
 </form>
 {{/user}}
+<p>
 {{#events}}
+<div>
 {{description}}&nbsp;&nbsp;&nbsp;{{dateTimeStart}}&nbsp;&nbsp;&nbsp;{{dateTimeEnd}}<br />
+</div>
 {{/events}}
+<p/>
 </body>
 </html>
